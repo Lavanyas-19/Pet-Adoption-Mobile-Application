@@ -1,0 +1,15 @@
+# Node (Mobile App)
+node_modules/
+.expo/
+dist/
+*.apk
+
+# Python (Backend)
+__pycache__/
+*.pyc
+venv/
+.env
+
+# General
+.DS_Store
+.vscode/

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { petImages } from '../../imageMap';
 import * as Animatable from 'react-native-animatable';
 
 export default function Home() {
@@ -12,77 +11,74 @@ export default function Home() {
   useEffect(() => {
     fetch('http://192.168.1.4:8000/pets')
       .then(res => res.json())
-      .then(data => setPets(data))
-      .catch(err => console.log(err));
+      .then(data => {
+        console.log("Data fetched successfully");
+        setPets(data);
+      })
+      .catch(err => console.log("Fetch Error:", err));
   }, []);
 
   const categories = [
-    { name: 'Dogs', icon: 'dog', color: '#FFEDEA' },
+    { name: 'Dogs', icon: 'paw', color: '#FFEDEA' },
     { name: 'Cats', icon: 'logo-octocat', color: '#E7F5FF' },
     { name: 'Birds', icon: 'paw', color: '#F0FFF4' },
     { name: 'Others', icon: 'grid', color: '#FFF9DB' },
   ];
 
-
-
-// ... inside your Home component ...
-
-const renderPetCard = ({ item, index }) => (
-  <Animatable.View 
-    animation="fadeInUp" 
-    delay={index * 150} // Staggered effect: cards appear one by one
-    duration={800}
-    style={{ flex: 0.5 }} // Ensures grid layout stays intact
-  >
-    <TouchableOpacity 
-      style={styles.premiumCard} 
-      activeOpacity={0.8}
-      onPress={() => router.push({
-        pathname: `/details/${item.id}`,
-        params: { ...item } 
-      })}
+  const renderPetCard = ({ item, index }) => (
+    <Animatable.View 
+      animation="fadeInUp" 
+      delay={index * 150} 
+      duration={800}
+      style={{ flex: 0.5 }}
     >
-      {/* Zoom effect on the pet image when it loads */}
-      <Animatable.Image 
-        animation="zoomIn"
-        duration={1200}
-        source={petImages[item.image]} 
-        style={styles.cardImg} 
-      />
-      
-      <View style={styles.cardBody}>
-        {/* Slide in text from the left */}
-        <Animatable.Text 
-          animation="slideInLeft" 
-          duration={1000} 
-          style={styles.pName}
-        >
-          {item.name}
-        </Animatable.Text>
+      <TouchableOpacity 
+        style={styles.premiumCard} 
+        activeOpacity={0.8}
+        onPress={() => router.push({
+          pathname: `/details/${item.id}`,
+          params: { ...item } 
+        })}
+      >
+        {/* Standard Image with error logging to find the bug */}
+        <Image 
+          source={{ uri: item.image }} 
+          style={styles.cardImg}
+          resizeMode="cover"
+          onLoad={() => console.log(`Successfully loaded image for: ${item.name}`)}
+          onError={(e) => console.log(`Error loading image for ${item.name}:`, e.nativeEvent.error)}
+        />
         
-        <Text style={styles.pBreed}>{item.breed}</Text>
-        
-        <View style={styles.cardFooter}>
-           <Text style={styles.ageTag}>{item.age}</Text>
-           
-           {/* Pulsing Heart Icon for a lively feel */}
-           <Animatable.View 
-             animation="pulse" 
-             iterationCount="infinite" 
-             duration={1500}
-           >
-             <Ionicons name="heart-outline" size={20} color="#6C63FF" />
-           </Animatable.View>
+        <View style={styles.cardBody}>
+          <Animatable.Text 
+            animation="slideInLeft" 
+            duration={1000} 
+            style={styles.pName}
+          >
+            {item.name}
+          </Animatable.Text>
+          
+          <Text style={styles.pBreed}>{item.breed}</Text>
+          
+          <View style={styles.cardFooter}>
+             <Text style={styles.ageTag}>{item.age}</Text>
+             
+             <Animatable.View 
+               animation="pulse" 
+               iterationCount="infinite" 
+               duration={1500}
+             >
+               <Ionicons name="heart-outline" size={20} color="#6C63FF" />
+             </Animatable.View>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  </Animatable.View>
-);
+      </TouchableOpacity>
+    </Animatable.View>
+  );
 
   return (
     <View style={styles.main}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header: No random images, just clean branding */}
         <View style={styles.topHeader}>
           <View>
             <Text style={styles.greet}>Find your best friend</Text>
@@ -91,13 +87,11 @@ const renderPetCard = ({ item, index }) => (
               <Text style={styles.locName}>India</Text>
             </View>
           </View>
-          {/* Branded Profile Icon instead of a person */}
           <TouchableOpacity style={styles.profileBtn} onPress={() => router.push('/(tabs)/profile')}>
             <Ionicons name="person-circle" size={45} color="#6C63FF" />
           </TouchableOpacity>
         </View>
 
-        {/* Search Bar */}
         <View style={styles.searchSection}>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color="#999" />
@@ -108,7 +102,6 @@ const renderPetCard = ({ item, index }) => (
           </View>
         </View>
 
-        {/* Categories */}
         <Text style={styles.sectionTitle}>Categories</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catRow}>
           {categories.map((c, i) => (
@@ -119,7 +112,6 @@ const renderPetCard = ({ item, index }) => (
           ))}
         </ScrollView>
 
-        {/* Pet List */}
         <View style={styles.sectionHeader}>
            <Text style={styles.sectionTitle}>Nearby Rescues</Text>
            <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}>
@@ -157,7 +149,7 @@ const styles = StyleSheet.create({
   viewAll: { color: '#6C63FF', fontWeight: 'bold' },
   listContainer: { paddingBottom: 100 },
   premiumCard: { flex: 0.5, backgroundColor: '#FFF', margin: 5, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: '#F0F0F0' },
-  cardImg: { width: '100%', height: 150, backgroundColor: '#F5F7F9' },
+  cardImg: { width: '100%', height: 150, backgroundColor: '#F5F7F9' }, 
   cardBody: { padding: 12 },
   pName: { fontSize: 18, fontWeight: 'bold' },
   pBreed: { color: '#888', fontSize: 13, marginBottom: 8 },

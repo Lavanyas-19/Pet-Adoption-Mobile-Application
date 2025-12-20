@@ -1,8 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as Animatable from 'react-native-animatable'; // Import Animatable
-import { petImages } from '../../imageMap';
+import * as Animatable from 'react-native-animatable';
 
 export default function PetDetails() {
   const { id, name, breed, age, image } = useLocalSearchParams();
@@ -11,12 +10,13 @@ export default function PetDetails() {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header Image with FadeIn */}
+        {/* Header Image */}
         <View style={styles.imageContainer}>
           <Animatable.Image 
             animation="fadeIn"
             duration={1000}
-            source={petImages[image]} 
+            // FIXED: Use the 'uri' property for the network URL
+            source={{ uri: image }} 
             style={styles.heroImage} 
             resizeMode="cover"
           />
@@ -26,7 +26,6 @@ export default function PetDetails() {
         </View>
 
         <View style={styles.content}>
-          {/* Slide Name in from the Left */}
           <Animatable.Text 
             animation="slideInLeft" 
             duration={800} 
@@ -43,7 +42,6 @@ export default function PetDetails() {
             {breed} • {age}
           </Animatable.Text>
           
-          {/* Fade Description up */}
           <Animatable.View animation="fadeInUp" delay={500} duration={800}>
             <Text style={styles.description}>
               {name} is a wonderful {breed} looking for a loving home. 
@@ -52,7 +50,6 @@ export default function PetDetails() {
             </Text>
           </Animatable.View>
           
-          {/* Info Boxes with ZoomIn effect */}
           <View style={styles.infoRow}>
              <Animatable.View animation="zoomIn" delay={700} style={styles.infoBox}>
                <Text style={styles.infoLabel}>Weight</Text>
@@ -70,7 +67,6 @@ export default function PetDetails() {
         </View>
       </ScrollView>
 
-      {/* Footer with a Bounce Entrance */}
       <Animatable.View animation="bounceInUp" delay={1200} style={styles.footer}>
         <TouchableOpacity style={styles.chatBtn}>
            <Ionicons name="chatbubble-outline" size={24} color="#6C63FF" />
@@ -79,7 +75,7 @@ export default function PetDetails() {
           style={styles.adoptBtn} 
           onPress={() => router.push({
             pathname: '/details/adopt_form',
-            params: { id, name } // Passing data to the form
+            params: { id, name }
           })}
         >
            <Text style={styles.adoptText}>Adopt Me</Text>
@@ -88,8 +84,6 @@ export default function PetDetails() {
     </View>
   );
 }
-
-// ... styles remain the same as your previous version ...
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white' },

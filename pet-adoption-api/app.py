@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import pets_list
+from fastapi.staticfiles import StaticFiles
 from models import Pet
 from pydantic import BaseModel # Added for the adoption form structure
 
@@ -12,6 +13,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 # --- NEW STORAGE FOR ADOPTIONS ---
 adoption_requests = []
@@ -55,5 +58,5 @@ def submit_adoption(app_data: AdoptionApplication):
 
 @app.get("/admin/requests")
 def view_requests():
-    # You can visit http://your-ip:8000/admin/requests to see all data
+    
     return adoption_requests

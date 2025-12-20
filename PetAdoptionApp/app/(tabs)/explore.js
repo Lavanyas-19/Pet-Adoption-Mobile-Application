@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { petImages } from '../../imageMap';
 
 export default function Explore() {
   const [pets, setPets] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
-    fetch('http://192.168.1.4:8000/pets') // Fetches the full database.py list
+    // Fetches the full database.py list using your laptop's IP
+    fetch('http://192.168.1.4:8000/pets') 
       .then(res => res.json())
       .then(data => setPets(data))
       .catch(err => console.log(err));
@@ -20,7 +20,12 @@ export default function Explore() {
       style={styles.card} 
       onPress={() => router.push({ pathname: `/details/${item.id}`, params: { ...item } })}
     >
-      <Image source={petImages[item.image]} style={styles.petImg} />
+      {/* FIXED: Use uri: item.image instead of petImages map */}
+      <Image 
+        source={{ uri: item.image }} 
+        style={styles.petImg} 
+        resizeMode="cover" 
+      />
       <View style={styles.cardContent}>
         <Text style={styles.petName}>{item.name}</Text>
         <Text style={styles.petBreed}>{item.breed}</Text>
@@ -56,7 +61,7 @@ const styles = StyleSheet.create({
   input: { marginLeft: 10, flex: 1 },
   list: { paddingBottom: 100 },
   card: { flex: 0.5, backgroundColor: '#fff', margin: 8, borderRadius: 20, overflow: 'hidden', elevation: 3, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5 },
-  petImg: { width: '100%', height: 140 },
+  petImg: { width: '100%', height: 140, backgroundColor: '#F5F7F9' }, // Background color while loading
   cardContent: { padding: 12 },
   petName: { fontSize: 16, fontWeight: 'bold' },
   petBreed: { fontSize: 12, color: '#888' },

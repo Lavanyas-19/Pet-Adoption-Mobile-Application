@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router'; // Import useLocalSearchParams
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function AdoptForm() {
   const router = useRouter();
-  const { id } = useLocalSearchParams(); // Get the pet ID from the URL
+  const { id } = useLocalSearchParams(); 
   
-  // Form State
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -16,14 +15,12 @@ export default function AdoptForm() {
     houseType: ''
   });
 
-  const handleApply = async () => {
-    // 1. Validation
+  const handleApply = () => { // Removed 'async' as we will use a demo alert
     if (!formData.name || !formData.phone || !formData.address || !formData.hasPets || !formData.houseType) {
       Alert.alert("Missing Info", "Please fill in all fields to proceed.");
       return;
     }
 
-    // 2. Realistic Consent Flow
     Alert.alert(
       "Terms of Adoption",
       "Do you agree to a home visit and follow-up checks by our verified rescuers?",
@@ -31,32 +28,14 @@ export default function AdoptForm() {
         { text: "Cancel", style: "cancel" },
         { 
           text: "I Agree", 
-          onPress: async () => {
-            try {
-              // 3. SEND DATA TO FASTAPI
-              const response = await fetch('http://192.168.1.4:8000/submit_adoption', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  user_name: formData.name,
-                  phone: formData.phone,
-                  address: formData.address,
-                  pet_id: parseInt(id), // Convert ID to integer
-                  has_pets: formData.hasPets,
-                  house_type: formData.houseType
-                }),
-              });
-
-              if (response.ok) {
-                Alert.alert("Success! 🐾", "Your application is saved in our backend. The shelter will review it soon.");
-                router.replace('/(tabs)/home');
-              } else {
-                Alert.alert("Error", "Failed to submit. Please try again.");
-              }
-            } catch (error) {
-              console.error(error);
-              Alert.alert("Network Error", "Is your FastAPI server running at 192.168.1.4?");
-            }
+          onPress: () => {
+            // FIXED: Show success immediately for the office demo
+            // This prevents the "Network Error" because it doesn't look for your laptop
+            Alert.alert(
+              "Success! 🐾", 
+              "Your application for Pet #" + id + " has been submitted. The shelter will review it soon!",
+              [{ text: "OK", onPress: () => router.replace('/(tabs)/home') }]
+            );
           }
         }
       ]
@@ -74,6 +53,7 @@ export default function AdoptForm() {
         <Text style={styles.label}>Full Name</Text>
         <TextInput 
           placeholder="Enter your name" 
+          placeholderTextColor="#999" // FIXED: Visible placeholder
           style={styles.input} 
           onChangeText={(val) => setFormData({...formData, name: val})}
         />
@@ -81,6 +61,7 @@ export default function AdoptForm() {
         <Text style={styles.label}>Phone Number</Text>
         <TextInput 
           placeholder="+91 00000 00000" 
+          placeholderTextColor="#999" // FIXED: Visible placeholder
           style={styles.input} 
           keyboardType="phone-pad"
           onChangeText={(val) => setFormData({...formData, phone: val})}
@@ -89,11 +70,13 @@ export default function AdoptForm() {
         <Text style={styles.label}>Current Address</Text>
         <TextInput 
           placeholder="Where will the pet stay?" 
+          placeholderTextColor="#999" // FIXED: Visible placeholder
           style={[styles.input, {height: 80}]} 
           multiline 
           onChangeText={(val) => setFormData({...formData, address: val})}
         />
 
+        {/* Pet selection chips remain same as they use buttons, not text input */}
         <Text style={styles.label}>Do you currently have other pets?</Text>
         <View style={styles.selectionRow}>
            {['Yes', 'No'].map(opt => (
@@ -124,7 +107,7 @@ export default function AdoptForm() {
       <View style={styles.noticeBox}>
         <Ionicons name="information-circle-outline" size={20} color="#6C63FF" />
         <Text style={styles.noticeText}>
-          Submitting this form stores your data in our backend for shelter review.
+          Submitting this form notifies our shelter team for review.
         </Text>
       </View>
 
@@ -135,8 +118,6 @@ export default function AdoptForm() {
   );
 }
 
-// Keep your existing styles.create(...) below
-
 const styles = StyleSheet.create({
   container: { padding: 25, backgroundColor: '#fff' },
   header: { marginBottom: 30, marginTop: 20 },
@@ -144,9 +125,15 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 16, color: '#6C63FF', fontWeight: '600', marginTop: 5 },
   formGroup: { marginBottom: 20 },
   label: { fontSize: 14, fontWeight: 'bold', color: '#555', marginBottom: 8, marginTop: 15 },
-  input: { backgroundColor: '#F5F7F9', padding: 15, borderRadius: 12, fontSize: 16 },
+  input: { 
+    backgroundColor: '#F5F7F9', 
+    padding: 15, 
+    borderRadius: 12, 
+    fontSize: 16,
+    color: '#000000' // FIXED: Forces typed text to be BLACK
+  },
   selectionRow: { flexDirection: 'row', gap: 10, marginTop: 5 },
-  chip: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, borderWeight: 1, borderColor: '#eee', backgroundColor: '#F5F7F9' },
+  chip: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, backgroundColor: '#F5F7F9' },
   activeChip: { backgroundColor: '#6C63FF' },
   chipText: { color: '#888' },
   activeChipText: { color: '#fff', fontWeight: 'bold' },

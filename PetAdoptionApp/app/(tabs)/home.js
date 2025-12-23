@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Animatable from 'react-native-animatable';
 
+// FIXED: Using cloud links and local data to ensure it works in the office
+const PETS_DATA = [
+    {"id": 1, "name": "Rocky", "breed": "Golden Retriever", "age": "2 Yrs", "image": "https://i.ibb.co/n854pS7v/dog1.jpg"},
+    {"id": 2, "name": "Tiger", "breed": "Labrador Retriever", "age": "3 Yrs", "image": "https://i.ibb.co/W47967dZ/dog2.jpg"},
+    {"id": 3, "name": "Luna", "breed": "Siamese", "age": "3 Yrs", "image": "https://i.ibb.co/XZcJPnvW/cat1.jpg"},
+    {"id": 4, "name": "Jackie", "breed": "Schnauzer", "age": "1 Yrs", "image": "https://i.ibb.co/39jK81qL/schnauzer.jpg"},
+    {"id": 5, "name": "Tommy", "breed": "Black Poodle dog", "age": "3 Yrs", "image": "https://i.ibb.co/VYTXs3bL/Black-Poodle-dog.jpg"},
+    {"id": 6, "name": "Milo", "breed": "Ragdoll", "age": "2 Yrs", "image": "https://i.ibb.co/8CW9cjm/cat2.jpg"},
+    {"id": 7, "name": "Jimmy", "breed": "Shih tzu", "age": "2 Yrs", "image": "https://i.ibb.co/kVTGnqnq/Shih-tzu-Dog.jpg"},
+    {"id": 8, "name": "Snowy", "breed": "White Furry", "age": "1 Yrs", "image": "https://i.ibb.co/KjkBwpNt/White-Furry.jpg"},
+    {"id": 9, "name": "Simba", "breed": "Golden retreiver", "age": "3 Yrs", "image": "https://i.ibb.co/Zb85H47/golden-retreiver.jpg"},
+    {"id": 10, "name": "Chloe", "breed": "Indie cat", "age": "1 Yrs", "image": "https://i.ibb.co/DDBncyFJ/indie-cat.jpg"},
+];
+
 export default function Home() {
   const router = useRouter();
-  const [pets, setPets] = useState([]);
-
-  useEffect(() => {
-    fetch('http://192.168.1.4:8000/pets')
-      .then(res => res.json())
-      .then(data => {
-        console.log("Data fetched successfully");
-        setPets(data);
-      })
-      .catch(err => console.log("Fetch Error:", err));
-  }, []);
 
   const categories = [
     { name: 'Dogs', icon: 'paw', color: '#FFEDEA' },
@@ -40,13 +43,10 @@ export default function Home() {
           params: { ...item } 
         })}
       >
-        {/* Standard Image with error logging to find the bug */}
         <Image 
           source={{ uri: item.image }} 
           style={styles.cardImg}
           resizeMode="cover"
-          onLoad={() => console.log(`Successfully loaded image for: ${item.name}`)}
-          onError={(e) => console.log(`Error loading image for ${item.name}:`, e.nativeEvent.error)}
         />
         
         <View style={styles.cardBody}>
@@ -62,12 +62,7 @@ export default function Home() {
           
           <View style={styles.cardFooter}>
              <Text style={styles.ageTag}>{item.age}</Text>
-             
-             <Animatable.View 
-               animation="pulse" 
-               iterationCount="infinite" 
-               duration={1500}
-             >
+             <Animatable.View animation="pulse" iterationCount="infinite" duration={1500}>
                <Ionicons name="heart-outline" size={20} color="#6C63FF" />
              </Animatable.View>
           </View>
@@ -95,7 +90,11 @@ export default function Home() {
         <View style={styles.searchSection}>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color="#999" />
-            <TextInput placeholder="Search puppies, kittens..." style={styles.input} />
+            <TextInput 
+                placeholder="Search puppies, kittens..." 
+                placeholderTextColor="#999999" // FIXED: Visible placeholder
+                style={styles.input} 
+            />
             <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}>
                 <Ionicons name="options" size={20} color="#6C63FF" />
             </TouchableOpacity>
@@ -120,7 +119,7 @@ export default function Home() {
         </View>
 
         <FlatList
-          data={pets}
+          data={PETS_DATA}
           renderItem={renderPetCard}
           keyExtractor={item => item.id.toString()}
           numColumns={2}
@@ -140,7 +139,12 @@ const styles = StyleSheet.create({
   locName: { fontWeight: 'bold', fontSize: 20 },
   searchSection: { marginTop: 25 },
   searchBar: { flexDirection: 'row', backgroundColor: '#F5F7F9', padding: 15, borderRadius: 18, alignItems: 'center' },
-  input: { flex: 1, marginLeft: 10 },
+  input: { 
+    flex: 1, 
+    marginLeft: 10, 
+    color: '#000000', // FIXED: Typed text is now BLACK
+    fontSize: 16 
+  },
   sectionTitle: { fontSize: 22, fontWeight: 'bold', marginTop: 30, marginBottom: 15 },
   catRow: { flexDirection: 'row' },
   chip: { flexDirection: 'row', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 15, marginRight: 15, alignItems: 'center' },

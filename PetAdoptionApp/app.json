@@ -3,7 +3,7 @@
     "name": "PetAdoptionApp",
     "slug": "PetAdoptionApp",
     "scheme": "pet-adoption-app",
-    "version": "1.0.0",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,9 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.lavanya_19.PetAdoptionApp"
+      "package": "com.lavanya_19.PetAdoptionApp",
+      "versionCode": 7,
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

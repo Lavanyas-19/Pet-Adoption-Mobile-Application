@@ -14,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/assets", StaticFiles(directory="assets"), name="assets")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # --- NEW STORAGE FOR ADOPTIONS ---
 adoption_requests = []
